@@ -1,6 +1,8 @@
 ---
 title: "Regressão linear na prática"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r warning=FALSE, echo=FALSE}
@@ -106,7 +108,7 @@ Produza aqui a sua versão desse texto, portanto:
 
 -----
 
-*SUBSTITUA ESSE TEXTO*
+Nós utilizamos regressão linear com o objetivo de analisar se a quantidade de docentes permanentes tem uma associação significativa com a produção do programa. Em nosso design de estudo, nós utilizamos a quantidade de docentes permanentes (*qdp*) como a variável independente e a produção do programa (*pp*) como a variável dependente. Os resultados da regressão indicaram que um modelo com esta única variável independente como preditor no formato *pp* = -41.27309 + 4.81337.*qdp* é capaz de explicar 0.81% da variância da variável de resposta (*R²* de 0.81). Nós observamos que, *qdp*, medida como o número que representa a quantidade de docentes permanentes no programa tem uma relação significativa com o erro (b = [4.27; 5.36], IC com 95%). Como resultado disso, o aumento de uma unidade de *qdp* produz uma mudança de 4.81337 em *pp*.
 
 -----
 
@@ -114,7 +116,7 @@ Dito isso, o que significa a relação que você encontrou na prática para ente
 
 -----
 
-*SUBSTITUA ESSE TEXTO PELA SUA DISCUSSÃO DOS RESULTADOS*
+Como um resultado prático, nós pudemos observar que, a quantidade de docentes permanentes, em programas de pós graduação no Brasil em computação, tem uma forte relação com a produtividade do programa. Na prática, essa relação nos permite destacar que os programas que contém uma maior quantidade de docentes permanentes também vão apresentar uma maior produtividade. Isso nós permite imaginar um palpite do por quê dessa relação ser forte. Nós acreditamos que, os programas que possuem uma maior quantidade de docentes permanentes também são os programas que mais contém profissionais engajados na carreira de pesquisador. Esse engajamento funciona como uma engrenagem propulsora para o aumento da produtividade dos programas. Contudo, está é apenas uma hipótese anédota que nós não investigamos.
 
 -----
 
