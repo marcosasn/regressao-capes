@@ -1,14 +1,23 @@
 ---
-title: "Regressão linear na prática"
+title: "Lab 5 - Checkpoint 1: Regressão linear na prática"
+author: "Marcos Nascimento (marcosantonio@copin.ufcg.edu.br)"
+date: "June 16, 2018"
 output:
   html_document:
     df_print: paged
 ---
 
-```{r warning=FALSE, echo=FALSE}
+<style>
+    body {text-align: justify;
+    font-family: "Times New Roman";
+    -webkit-column-count:2;}
+</style>
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(broom)
 library(modelr)
+library(GGally)
 source(here::here("code/lib.R"))
 theme_set(theme_report())
 
@@ -25,14 +34,11 @@ paleta = c("#404E4D",
 
 ## Dados da CAPES sobre avaliação da pós-graduação
 
-A CAPES é um órgão do MEC que tem a atribuição de acompanhar a pós-graduação na universidade brasileira. Uma das formas que ela encontrou de fazer isso e pela qual ela é bastante criticada é através de uma avaliação quantitativa a cada x anos (era 3, mudou para 4). 
+A CAPES é um órgão do MEC que tem a atribuição de acompanhar a pós-graduação na universidade brasileira. Uma das formas que ela encontrou de fazer isso e pela qual ela é bastante criticada é através de uma avaliação quantitativa a cada x anos (era 3, mudou para 4). Usaremos dados da penúltima avaliação da CAPES.
 
-Usaremos dados da penúltima avaliação da CAPES: 
-
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 cacc = read_projectdata()
-
-glimpse(cacc)
+cacc = normalize_column(cacc)
 ```
 
 ### Produção e produtividade de artigos
@@ -49,10 +55,9 @@ cacc = cacc %>%
          doutorados_pprof = doutorados / `Docentes permanentes`)
 ```
 
-
 ### EDA
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 cacc %>% 
   ggplot(aes(x = `Docentes permanentes`)) + 
   geom_histogram(bins = 15, fill = paleta[1])
@@ -67,10 +72,9 @@ cacc %>%
 ```
 
 Se quisermos modelar o efeito do tamanho do programa em termos de docentes (permanentes) na quantidade de artigos publicados, podemos usar regressão. 
-
 *Importante*: sempre queremos ver os dados antes de fazermos qualquer modelo ou sumário: 
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 cacc %>% 
   ggplot(aes(x = `Docentes permanentes`, y = producao)) + 
   geom_point()
@@ -80,14 +84,13 @@ Parece que existe uma relação. Vamos criar um modelo então:
 
 ```{r}
 modelo1 = lm(producao ~ `Docentes permanentes`, data = cacc)
-
 tidy(modelo1, conf.int = TRUE, conf.level = 0.95)
 glance(modelo1)
 ```
 
 Para visualizar o modelo:
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 cacc_augmented = cacc %>% 
   add_predictions(modelo1) 
 
@@ -104,11 +107,11 @@ Normalmente reportaríamos o resultado da seguinte maneira, substituindo VarInde
 
 > Regressão múltipla foi utilizada para analisar se VarIndep1 e VarIndep2 tem uma associação significativa com VarDep. Os resultados da regressão indicam que um modelo com os 2 preditores no formato VarDep = XXX.VarIndep1 + YYY.VarIndep2 explicam XX,XX% da variância da variável de resposta (R2 = XX,XX). VarIndep1, medida como/em [unidade ou o que é o 0 e o que é 1] tem uma relação significativa com o erro (b = [yy,yy; zz,zz], IC com 95%), assim como VarIndep2 medida como [unidade ou o que é o 0 e o que é 1] (b = [yy,yy; zz,zz], IC com 95%). O aumento de 1 unidade de VarIndep1 produz uma mudança de xxx em VarDep, enquanto um aumento...
 
-Produza aqui a sua versão desse texto, portanto:
+Produza aqui a sua versão desse texto:
 
 -----
 
-Nós utilizamos regressão linear com o objetivo de analisar se a quantidade de docentes permanentes tem uma associação significativa com a produção do programa. Em nosso design de estudo, nós utilizamos a quantidade de docentes permanentes (*qdp*) como a variável independente e a produção do programa (*pp*) como a variável dependente. Os resultados da regressão indicaram que um modelo com esta única variável independente como preditor no formato *pp* = -41.27309 + 4.81337.*qdp* é capaz de explicar 0.81% da variância da variável de resposta (*R²* de 0.81). Nós observamos que, *qdp*, medida como o número que representa a quantidade de docentes permanentes no programa tem uma relação significativa com o erro (b = [4.27; 5.36], IC com 95%). Como resultado disso, o aumento de uma unidade de *qdp* produz uma mudança de 4.81337 em *pp*.
+Nós utilizamos regressão linear com o objetivo de analisar se a quantidade de docentes permanentes tem uma associação significativa com a produção do programa. Em nosso design de estudo, nós utilizamos a quantidade de docentes permanentes (*qdp*) como a variável independente e a produção do programa (*pp*) como a variável dependente. Os resultados da regressão indicaram que um modelo com esta única variável independente como preditor no formato *pp = -41.27309 + 4.81337.qdp* é capaz de explicar 81.46% da variância da variável de resposta (*R²* de 0.814). Nós observamos que *qdp*, medida como o número que representa a quantidade de docentes permanentes no programa, tem uma relação significativa com o erro (b = [4.27; 5.36], IC com 95%). Como resultado disso, o aumento de uma unidade de *qdp* produz uma mudança de 4.81337 em *pp*.
 
 -----
 
@@ -116,7 +119,7 @@ Dito isso, o que significa a relação que você encontrou na prática para ente
 
 -----
 
-Como um resultado prático, nós pudemos observar que, a quantidade de docentes permanentes, em programas de pós graduação no Brasil em computação, tem uma forte relação com a produtividade do programa. Na prática, essa relação nos permite destacar que os programas que contém uma maior quantidade de docentes permanentes também vão apresentar uma maior produtividade. Isso nós permite imaginar um palpite do por quê dessa relação ser forte. Nós acreditamos que, os programas que possuem uma maior quantidade de docentes permanentes também são os programas que mais contém profissionais engajados na carreira de pesquisador. Esse engajamento funciona como uma engrenagem propulsora para o aumento da produtividade dos programas. Contudo, está é apenas uma hipótese anédota que nós não investigamos.
+Como um resultado prático, nós pudemos observar que, a quantidade de docentes permanentes, em programas de pós graduação no Brasil em computação, tem uma forte relação com a produção do programa. Na prática, essa relação nos permite destacar que os programas que contém uma maior quantidade de docentes permanentes também vão apresentar uma maior produção de artigos. Isso nos permite imaginar um palpite do por quê dessa relação. Nós acreditamos que, os programas que possuem uma maior quantidade de docentes permanentes também são os programas que mais contém profissionais engajados na carreira de pesquisador. Esse engajamento funciona como uma engrenagem propulsora para o aumento da produção nos programas. Contudo, esta é apenas uma hipótese anédota que nós não investigamos.
 
 -----
 
@@ -135,22 +138,17 @@ Visualizar o modelo com muitas variáveis independentes fica mais difícil
 
 ```{r}
 para_plotar_modelo = cacc %>% 
-  data_grid(producao = seq_range(producao, 10), # Crie um vetor de 10 valores no range
-            `Docentes permanentes` = seq_range(`Docentes permanentes`, 4),  
-            # mestrados = seq_range(mestrados, 3),
+  data_grid(producao = seq_range(producao, 10),
+            `Docentes permanentes` = seq_range(`Docentes permanentes`, 4),
             mestrados = median(mestrados),
             doutorados = seq_range(doutorados, 3)) %>% 
   add_predictions(modelo2)
-
-glimpse(para_plotar_modelo)
-
 ```
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 para_plotar_modelo %>% 
   ggplot(aes(x = `Docentes permanentes`, y = pred)) + 
   geom_line(aes(group = doutorados, colour = doutorados)) + 
-  # facet_grid(. ~ as.factor(mestrados)) + 
   geom_point(data = cacc, aes(y = producao, colour = doutorados))
 ```
 
@@ -158,13 +156,62 @@ Considerando agora esses três fatores, o que podemos dizer sobre como cada um d
 
 -----
 
-**EXPLICAÇÃO**: *Substitua esse texto por texto feito tal qual o que usamos com uma variável*
+Nós podemos dizer que existe uma associação significativa com a produção do programa se analisarmos a quantidade de docentes permanentes e de alunos. Neste design de estudo, incluiria três variáveis independentes (i) e uma variável dependete (ii): (i) a quantidade de docentes permanentes (*qdp*), alunos de mestrado (*qam*) e alunos de doutorado (*qad*); (ii) a produção do programa (*pp*). Os resultados da regressão indicaram que um modelo incluindo estas variáveis independentes como preditoras no formato *pp = -14.3663077 + 3.4997112.qdp - 0.1949515.qam + 1.0007711.qad* é capaz de explicar 87.07% da variância da variável de resposta (*R²* de 0.871). Como consequência, nós observamos que este modelo explica mais que o modelo anterior (*R²* de 0.814). Nós observamos que *qdp*, *qam* e *qad*, medidas como o número que representa a quantidade de docentes permanentes, alunos de mestrado e doutorado no programa, respectivamente, tem uma relação significativa com o erro (*bqdp* = [2.58; 4.42], *bqam* = [-0.36; -0.03] e *bqad* = [0.63; 1.37] IC com 95%). Como resultado disso, nós observamos que os preditores que mais explicam *pp* são *qdp* e *qad*. Por exemplo, aumentar uma unidade de *qad* produz uma mudança de 1.0007711 em *pp*.
 
 -----
 
-
 ## Agora produtividade 
 
-Diferente de medirmos produção (total produzido), é medirmos produtividade (produzido / utilizado). Abaixo focaremos nessa análise. Para isso crie um modelo que investiga como um conjunto de fatores que você julga que são relevantes se relacionam com a produtividade dos programas. Crie um modelo que avalie como _pelo menos 3 fatores_ se relacionam com a produtividade de um programa. Pode reutilizar fatores que já definimos e analizamos para produção. Mas cuidado para não incluir fatores que sejam função linear de outros já incluídos (ex: incluir A, B e um tercero C=A+B)
+Diferente de medirmos produção (total produzido), é medirmos produtividade (produzido / utilizado). Abaixo focaremos nessa análise. Para isso crie um modelo que investiga como um conjunto de fatores que você julga que são relevantes se relacionam com a produtividade dos programas. Crie um modelo que avalie como _pelo menos 3 fatores_ se relacionam com a produtividade de um programa. Pode reutilizar fatores que já definimos e analizamos para produção. Mas cuidado para não incluir fatores que sejam função linear de outros já incluídos (ex: incluir A, B e um terceiro C=A+B). Produza abaixo o modelo e um texto que comente (i) o modelo, tal como os que fizemos antes, e (ii) as implicações - o que aprendemos sobre como funcionam programas de pós no brasil?
 
-Produza abaixo o modelo e um texto que comente (i) o modelo, tal como os que fizemos antes, e (ii) as implicações - o que aprendemos sobre como funcionam programas de pós no brasil?.
+### EDA
+
+Se quisermos modelar o efeito do nível do programa, em termos de conceito, na produtividade podemos também usar regressão. Nós selecionamos um conjunto de fatores que julgamos relevantes por estarem relacionados com a produtividade. Os fatores selecionados incluem: o nível do programa (*np*), o fato do programa possuir curso de doutorado (*td*), e o número de artigos em conferências (*nac*). A escolha dos fatores iniciou fazendo a análise da distribuição de cada um individualmente com a produtividade. Nós observamos que, tanto o nível, o fato de possuir curso de doutorado, quanto a quantidade de artigos em conferência estão relacionados com a produtividade do programa. Por exemplo, observando cada um dos gráficos abaixo, nós podemos observar que a produtividade cresce a medida que o nível do programa cresce ou até mesmo quando a quantidade de artigos em conferência cresce. Essa relação também se mostra evidente quando comparamos a produtividade do programa atentando para o fato do mesmo possuir curso de doutorado.
+
+```{r warning=FALSE, message=FALSE}
+ggplot(cacc, aes(cacc$`Nível`,produtividade)) +
+    geom_jitter(width = .1) +
+    labs(x = "Nível do programa")
+
+ggplot(cacc, aes(cacc$`Artigos em conf`,produtividade)) +
+    geom_jitter(width = .1) +
+    labs(x = "Artigos em conf")
+
+ggplot(cacc, aes(cacc$`Tem doutorado`,produtividade)) +
+    geom_jitter(width = .1) +
+    labs(x = "Tem doutorado")
+```
+
+```{r}
+modelo3 = lm(produtividade ~ `Nível` + `Tem doutorado` + `Artigos em conf`, data = cacc)
+
+tidy(modelo3, conf.int = TRUE, conf.level = 0.95)
+glance(modelo3)
+```
+
+Um texto que comente o modelo, tal como nos exemplos:
+
+-----
+
+Um design de estudo incluindo *np*, *td* e *nac* como variáveis independentes e a produtividade do programa (*pdp*) como variável dependente pode nos levar a resultados interessantes. Os resultados da regressão indicaram que um modelo incluindo estas variáveis independentes como preditoras no formato *pdp = 0.089035927 + 0.350776860.np + 0.738250363.td + 0.002386606.nac* é capaz de explicar 60.74% da variância da variável de resposta (*R²* de 0.607). Nós observamos que, *np*, *td* e *nac* apresentam uma relação significativa com o erro (*bnp* = [0.05; 0.65], *btd* = [0.17; 1.30] e *bnac* = [0.00069; 0.00408] IC com 95%). Como resultado disso, nós observamos que os preditores que mais explicam *pdp* são *np* e *td*. Por exemplo, aumentar uma unidade de *td* produz uma mudança de 0.738250363 em *pdp*.
+
+-----
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+para_plotar_modelo = cacc %>%
+    add_predictions(modelo3)
+
+para_plotar_modelo %>% 
+  ggplot(aes(x = `Artigos em conf`, y = pred)) + 
+  geom_point(data = cacc, aes(y = `Artigos em conf`,colour = `Tem doutorado`)) +
+    facet_wrap( ~`Tem doutorado`) +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+As implicações do que poderíamos aprender:
+
+-----
+
+Como um resultado prático, nós pudemos observar que, a existência do curso de doutorado, em programas de pós graduação no Brasil em computação, tem uma forte relação com a produtividade. Na prática, essa relação nos permite destacar que os programas que contém este curso também vão apresentar uma maior produtividade. Isso nós permite imaginar um palpite do por quê dessa relação. Nós acreditamos que, os programas que possuem este curso também são os programas que mais pressionam os estudantes a mostrarem engajamento em suas linhas de pesquisa. Esse engajamento funciona como uma engrenagem propulsora para o aumento da produtividade dos programas. Contudo, está é apenas uma hipótese anédota que nós não investigamos.
+
+-----
